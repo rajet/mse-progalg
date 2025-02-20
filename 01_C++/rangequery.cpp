@@ -52,9 +52,17 @@ static std::vector<Point> rqSerial(std::vector<Point>& v, const Point& from, con
 // Parallel range query
 static std::vector<Point> rqPar1(std::vector<Point>& v, const Point& from, const Point& to) {
 	std::vector<Point> result;
-
 	// TODO use std::mutex for thread safe access of result
-	return result;
+    std::mutex mtx;
+    
+    std::for_each(std::execution::par, v.begin(), v.end(), [&](const Point& p) {
+        if (from <= p && p <= to) {
+            std::lock_guard<std::mutex> lock(mtx);
+            result.push_back(p);
+        }
+    });
+    
+    return result;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

@@ -19,14 +19,21 @@ static double findSerial(const std::vector<double>& arr) {
 // Parallel search with max_element
 static double findPar1(const std::vector<double>& arr) {
 	// TODO use std::max_element
-	return 0;
+	return *std::max_element(std::execution::par, arr.begin(), arr.end());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Parallel reduction
 static double findPar2(const std::vector<double>& arr) {
 	// TODO use std::reduce with a lambda expression
-	return 0;
+	return std::reduce(std::execution::par, arr.begin(), arr.end(), double(0), [](double a, double b){
+		if(a > b) {
+			return a;
+		}
+		else {
+			return b;
+		}
+	});
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

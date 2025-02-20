@@ -28,22 +28,27 @@ static int64_t sumSerial(const std::vector<int>& arr) {
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Parallel summation using parallel for_each in C++20 and atomic_int64_t
 static int64_t sumPar1(const std::vector<int>& arr) {
-	// TODO: use std::atomic_int64_t and std::for_each with std::execution::par
-	return 0;
+	// DONE: use std::atomic_int64_t and std::for_each with std::execution::par
+	std::atomic_int64_t total = 0;
+	std::for_each(std::execution::par, arr.begin(), arr.end(), [&](int64_t n){
+        total.fetch_add(n);
+	});
+	return total;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Parallel summation using parallel reduce in C++20 and implicit reduction
 static int64_t sumPar2(const std::vector<int>& arr) {
-	// TODO use std::reduce
-	return 0;
+	return std::reduce(std::execution::par, arr.begin(), arr.end(), int64_t(0));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Parallel summation using parallel reduce in C++20 and explicit reduction
 static int64_t sumPar3(const std::vector<int>& arr) {
-	// TODO use std::reduce and lambda expression [](int64_t a, int64_t b) {... }
-	return 0;
+	// DONE use std::reduce and lambda expression [](int64_t a, int64_t b) {... }
+	return std::reduce(std::execution::par, arr.begin(), arr.end(), int64_t(0), [](int64_t a, int64_t b){
+		return a + b;
+	});
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
