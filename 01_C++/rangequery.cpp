@@ -71,8 +71,13 @@ static std::vector<Point> rqPar2(std::vector<Point>& v, const Point& from, const
 	const auto nThreads = std::thread::hardware_concurrency();
 
 	std::vector<Point> result;
-
+	std::vector<std::future<std::vector<Point>>> futures;
 	// TODO: don't use synchronization, but serial reduction
+	
+	futures.reserve(nThreads);	
+	// for(unsigned)
+
+
 	return result;
 }
 

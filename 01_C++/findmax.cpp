@@ -26,13 +26,8 @@ static double findPar1(const std::vector<double>& arr) {
 // Parallel reduction
 static double findPar2(const std::vector<double>& arr) {
 	// TODO use std::reduce with a lambda expression
-	return std::reduce(std::execution::par, arr.begin(), arr.end(), double(0), [](double a, double b){
-		if(a > b) {
-			return a;
-		}
-		else {
-			return b;
-		}
+	return std::reduce(std::execution::par, arr.begin(), arr.end(), 0.0, [](double a, double b){
+		return std::max(a, b);
 	});
 }
 

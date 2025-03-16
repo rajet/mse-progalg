@@ -19,7 +19,12 @@ void matrixSortSeq(std::vector<std::vector<int>>& A) {
 //////////////////////////////////////////////////////////////////////////////////////////////
 // parallel sorting all arrays A[i]
 void matrixSortOmp(std::vector<std::vector<int>>& A) {
-	// TODO use OMP to parallelize a for loop
+	// DONE use OMP to parallelize a for loop
+	#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
+	for (size_t i = 0; i < A.size(); i++) {
+		std::sort(A[i].begin(), A[i].end());
+	}
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////

@@ -27,22 +27,48 @@ static int64_t sumSerial(const std::vector<int>& arr) {
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Parallel summation with critical section
 static int64_t sumPar1(const std::vector<int>& arr) {
-	// TODO use OMP for loop parallelization and an OMP critical section
-	return 0;
+	// DONE use OMP for loop parallelization and an OMP critical section
+	int64_t sum = 0;
+	#pragma omp parallel for num_threads(omp_get_max_threads())
+	for (size_t i = 0; i < arr.size(); i++){
+		#pragma omp critical
+		sum += arr[i];
+	}
+	return sum;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Parallel summation with explicit locks
 static int64_t sumPar2(const std::vector<int>& arr) {
-	// TODO use OMP for loop parallelization and an OMP lock
-	return 0;
+	// DONE use OMP for loop parallelization and an OMP lock
+	int64_t sum = 0;
+	omp_lock_t lock;
+
+	omp_init_lock(&lock);
+
+	#pragma omp parallel for num_threads(omp_get_max_threads())
+	for(size_t i = 0; i < arr.size(); i++){
+		omp_set_lock(&lock);
+		sum += arr[i];
+		omp_unset_lock(&lock);
+	}
+
+	omp_destroy_lock(&lock);
+
+	return sum;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-// Parallel summation with ...
+// Parallel summation with reduction
 static int64_t sumPar3(const std::vector<int>& arr) {
-	// TODO use OMP for loop parallelization and...
-	return 0;
+	// DONE use OMP for loop parallelization and reduction
+	int64_t sum = 0;
+
+	#pragma omp parallel for reduction(+:sum) num_threads(omp_get_max_threads())
+	for(size_t i = 0; i < arr.size(); i++){
+		sum += arr[i];
+	}
+	return sum;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +118,6 @@ void summationTests() {
 	sw.Restart();
 	const int64_t sum3 = sumPar3(arr);
 	sw.Stop();
-	check("OpenMP ... +=:", sum0, sum3, ts, sw.GetElapsedTimeMilliseconds());
+	check("OpenMP reduction +=:", sum0, sum3, ts, sw.GetElapsedTimeMilliseconds());
 
 }
