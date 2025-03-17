@@ -67,8 +67,53 @@ void quicksort(float a[], int left, int right) {
 void parallelQuicksort(float a[], int left, int right, int p) {
 	assert(p > 0);
 	assert(left >= 0 && left <= right);
-
 	// TODO use OMP
+
+	// Base case: use serial quicksort if array is small or only one thread available
+	if (p <= 1 || (right - left) <= 1000) {
+		quicksort(a, left, right);
+		return;
+	}
+	
+	// Compute pivot position using the median function
+	const size_t pivotPos = median(a, left, left + (right - left)/2, right);
+	const float pivot = a[pivotPos];
+	
+	// Partition the array like in serial quicksort
+	int i = left, j = right;
+	do {
+		while (a[i] < pivot) i++;
+		while (pivot < a[j]) j--;
+		if (i <= j) {
+			std::swap(a[i], a[j]);
+			i++;
+			j--;
+		}
+	} while (i <= j);
+	
+	// Split threads between partitions
+	int leftThreads = p / 2;
+	int rightThreads = p - leftThreads;
+	
+	// Initialize OpenMP parallel region if we're at the top level
+	#pragma omp parallel num_threads(p) if(p > 1 && omp_get_thread_num() == 0)
+	{
+		#pragma omp single nowait
+		{
+			// Create tasks for recursive calls
+			if (left < j) {
+				#pragma omp task
+				parallelQuicksort(a, left, j, leftThreads);
+			}
+			
+			if (i < right) {
+				#pragma omp task
+				parallelQuicksort(a, i, right, rightThreads);
+			}
+			
+			#pragma omp taskwait
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
